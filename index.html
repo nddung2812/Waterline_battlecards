@@ -39,7 +39,8 @@
   .trow .win{font-size:12.5px;color:var(--ink)}
 
   .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
-  table{border-collapse:collapse;width:100%;background:#fff;font-size:12px;min-width:1180px}
+  table{border-collapse:collapse;width:100%;background:#fff;font-size:12px}
+  .scroll table{min-width:1180px}
   th,td{padding:8px 9px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
   thead th{background:var(--teal);color:#fff;font-weight:600;position:sticky;top:0}
   th.dim{background:var(--teal-dark);position:sticky;left:0;z-index:2}
@@ -72,7 +73,8 @@
   .blk.win h4{color:var(--green)} .blk.weak h4{color:var(--red)}
   ul{margin:0 0 12px;padding-left:18px} li{margin-bottom:5px}
   .pitch{font-style:italic;background:#f4faf9;border-left:3px solid var(--teal);padding:8px 12px;border-radius:0 6px 6px 0;margin:0 0 14px}
-  .obj{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px}
+  .obj{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px;margin-top:4px}
+  .obj td{word-wrap:break-word;overflow-wrap:anywhere}
   .obj td{border:1px solid var(--line);padding:8px 10px}
   .obj td:first-child{width:42%;background:#fafbfb;font-weight:500}
 
@@ -88,7 +90,7 @@
 
 <header class="top">
   <h1>Waterline — Competitor Battlecards</h1>
-  <div class="sub">Sales &amp; marketing reference · QLD/NSW resources engineering market · 11 competitors</div>
+  <div class="sub">Sales &amp; marketing reference · QLD/NSW resources engineering market · 12 competitors</div>
   <div class="meta">Research date: June 2026 · Tabs grouped by tier · Click a competitor · Prints clean to PDF · Refresh quarterly</div>
 </header>
 
@@ -104,7 +106,7 @@
   </div>
   <div class="tier t2">
     <h3>Tier 2 — Specialists &amp; advisories</h3>
-    <div class="who">MEC Mining · Wave International · Palaris · Enable Advisory</div>
+    <div class="who">MEC Mining · Wave International · Palaris · Enable Advisory · Witthoft</div>
     <div class="verdict">Brisbane/national, more scale or polish, but head-office-centric and often advisory-led. Win on coalfields proximity, hands-on delivery, 3D, and senior responsiveness.</div>
   </div>
   <div class="tier t3">
@@ -126,6 +128,7 @@
     <button class="tab" data-t="wave">Wave International</button>
     <button class="tab" data-t="palaris">Palaris</button>
     <button class="tab" data-t="enable">Enable Advisory</button>
+    <button class="tab" data-t="witthoft">Witthoft</button>
   </div></div>
   <div class="tabgrp"><div class="lbl">Tier 3 — global giants</div><div class="tabrow">
     <button class="tab" data-t="srk">SRK Consulting</button>
@@ -379,6 +382,41 @@
   </div>
 </div>
 
+<!-- WITTHOFT -->
+<div class="card" id="witthoft">
+  <div class="head"><div><h3>Witthoft Engineering</h3><div class="pos">Brisbane consultancy for electrical, instrumentation/control (SCADA) and civil design — focused on the water/wastewater sector.</div></div><span class="thpill b-low" style="color:#fff">THREAT: LOW</span></div>
+  <div class="body">
+    <div class="facts"><span class="fact">Brisbane only (Fortitude Valley)</span><span class="fact">Founded 2010</span><span class="fact">~20–40 staff</span><span class="fact">Water · wastewater · utilities</span></div>
+    <div class="pitch">No distinct slogan. "Quality and cost-effective service," RPEQ-supervised, "60+ years' combined water &amp; sewerage experience."</div>
+    <div class="grid2">
+      <div class="blk win"><h4>Where they genuinely win</h4><ul>
+        <li>Deep water/wastewater domain expertise (hydraulics, pump stations, treatment-plant upgrades)</li>
+        <li>RPEQ-certified electrical + civil + SCADA/controls integration</li>
+        <li>Utility-insider credibility (founders ex-SEQWater, Queensland Urban Utilities, BCC)</li>
+        <li>15-year track record in its lane</li>
+      </ul></div>
+      <div class="blk weak"><h4>Where they're vulnerable</h4><ul>
+        <li>Almost no resources/mining footprint — water-utility focused, not coal/blue-chip</li>
+        <li>Brisbane-only — no Mackay/Bowen Basin presence</li>
+        <li>No structural engineering and no 3D scanning/printing</li>
+        <li>Weak digital/SEO (JS-only homepage, thin content) — easy to out-market</li>
+      </ul></div>
+    </div>
+    <div class="blk"><h4>How Waterline wins</h4><ul>
+      <li><strong>Resources/mining focus</strong> with blue-chip refs (Stanmore, Anglo, BHP) vs. their water-utility niche</li>
+      <li><strong>Coalfields proximity</strong> (Mackay) vs. Brisbane-only</li>
+      <li><strong>Full multi-discipline + structural + 3D</strong> they don't offer</li>
+      <li><strong>Owner's-mindset brand</strong> vs. corporate, credentials-led voice</li>
+    </ul></div>
+    <div class="blk"><h4>Objection handling</h4>
+      <table class="obj">
+        <tr><td>"Witthoft are strong on electrical and controls."</td><td>For water and wastewater utilities, yes. Their world is municipal infrastructure, not resources — we bring mining-sector depth, structural and 3D capability, and we're on the ground in the coalfields.</td></tr>
+        <tr><td>"They're a Brisbane multi-discipline firm."</td><td>Within a narrow band — electrical, civil, controls, no structural. For mine-site engineering you want our full multi-discipline team with an owner's mindset and Mackay presence.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- SRK -->
 <div class="card" id="srk">
   <div class="head"><div><h3>SRK Consulting (Australia)</h3><div class="pos">Global, employee-owned technical consultancy — exploration to closure, all commodities. The credentialled heavyweight.</div></div><span class="thpill b-med" style="color:#fff">THREAT: MEDIUM</span></div>
@@ -532,6 +570,7 @@
   <div class="trow"><div class="nm">AECOM<small>Tier 3 · global giant</small></div><div class="badge b-low">LOW-MED</div><div class="win">Mining isn't an AU priority (infra-led). Has a Mackay office but it's one cog. Counter with resources focus + speed.</div></div>
   <div class="trow"><div class="nm">Worley<small>Tier 3 · EPCM giant</small></div><div class="badge b-low">LOW-MED</div><div class="win">Mega-project + energy-transition bias; small jobs deprioritised. Counter with mid-tier focus + sustaining-capital value.</div></div>
   <div class="trow"><div class="nm">Enable Advisory<small>Tier 2 · Brisbane</small></div><div class="badge b-low">LOW</div><div class="win">Tiny ex-CEO advisory boutique, no delivery arm. Counter with engineering execution + capacity + Mackay presence.</div></div>
+  <div class="trow"><div class="nm">Witthoft<small>Tier 2 · Brisbane</small></div><div class="badge b-low">LOW</div><div class="win">Water/wastewater electrical &amp; civil specialist — different sector, no Mackay, no structural/3D. Minimal head-to-head overlap.</div></div>
 </div>
 
 <h2 class="section">Comparison matrix (scroll →)</h2>
@@ -552,19 +591,20 @@
       <th>Aurecon</th>
       <th>AECOM</th>
       <th>Worley</th>
+      <th>Witthoft</th>
     </tr>
   </thead>
   <tbody>
-    <tr><th>Tier</th><td class="us">—</td><td>1</td><td>1</td><td>1</td><td>2</td><td>2</td><td>2</td><td>2</td><td>3</td><td>3</td><td>3</td><td>3</td></tr>
-    <tr><th>QLD base</th><td class="us">Brisbane + Mackay</td><td>Mackay</td><td>Mackay + Bris</td><td>Mackay (sat.)</td><td>Brisbane</td><td>Brisbane CBD</td><td>—</td><td>Brisbane</td><td>Brisbane</td><td>Bris/Gladstone</td><td>Bris + Mackay</td><td>Bris/Gladstone</td></tr>
-    <tr><th>Mackay/coalfields</th><td class="us yes">Yes</td><td class="yes">Yes (HQ)</td><td class="yes">Yes (HQ)</td><td>Satellite</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>Office</td><td class="no">No</td></tr>
-    <tr><th>Scale</th><td class="us">Growing SME</td><td>~28+</td><td>11–50</td><td>Mature SME</td><td>~200</td><td>Mid multinat'l</td><td>~100–250</td><td>Tiny</td><td>100+ AU</td><td>~6.5k+</td><td>~3.7k AU</td><td>~4k AU</td></tr>
-    <tr><th>Multi-discipline eng.</th><td class="us yes">Yes</td><td class="yes">Yes</td><td class="no">Electrical only</td><td class="yes">Yes</td><td>Planning-led</td><td class="yes">Yes</td><td>Advisory-led</td><td>Advisory-led</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
-    <tr><th>Self-deliver build/fab</th><td class="us no">No</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>EPCM</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>EPCM</td><td>EPCM</td><td class="yes">EPC(M)</td></tr>
-    <tr><th>3D scan / print</th><td class="us yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>BIM</td><td>Digital</td><td>Digital</td></tr>
-    <tr><th>Owner's-mindset positioning</th><td class="us yes">Core</td><td>Partner-led</td><td>Contractor</td><td>Relational</td><td>Culture-led</td><td>Commercial eng.</td><td>Trusted advisor</td><td>Ex-operator</td><td>Institutional</td><td>Corporate</td><td>Corporate</td><td>Corporate</td></tr>
-    <tr><th>Content / SEO depth</th><td class="us">Growing (94% branded)</td><td>Project-led</td><td>Case studies</td><td>Thin</td><td>Big social</td><td class="yes">Strong</td><td>Case-study</td><td>Weak</td><td class="yes">Strong</td><td class="yes">Strong</td><td class="yes">Strong</td><td class="yes">Strong</td></tr>
-    <tr><th>Direct threat</th><td class="us">—</td><td class="no">High</td><td class="no">High</td><td>Med-High</td><td>Medium</td><td>Medium</td><td>Low-Med</td><td class="yes">Low</td><td>Medium</td><td>Low-Med</td><td>Low-Med</td><td>Low-Med</td></tr>
+    <tr><th>Tier</th><td class="us">—</td><td>1</td><td>1</td><td>1</td><td>2</td><td>2</td><td>2</td><td>2</td><td>3</td><td>3</td><td>3</td><td>3</td><td>2</td></tr>
+    <tr><th>QLD base</th><td class="us">Brisbane + Mackay</td><td>Mackay</td><td>Mackay + Bris</td><td>Mackay (sat.)</td><td>Brisbane</td><td>Brisbane CBD</td><td>—</td><td>Brisbane</td><td>Brisbane</td><td>Bris/Gladstone</td><td>Bris + Mackay</td><td>Bris/Gladstone</td><td>Brisbane</td></tr>
+    <tr><th>Mackay/coalfields</th><td class="us yes">Yes</td><td class="yes">Yes (HQ)</td><td class="yes">Yes (HQ)</td><td>Satellite</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>Office</td><td class="no">No</td><td class="no">No</td></tr>
+    <tr><th>Scale</th><td class="us">Growing SME</td><td>~28+</td><td>11–50</td><td>Mature SME</td><td>~200</td><td>Mid multinat'l</td><td>~100–250</td><td>Tiny</td><td>100+ AU</td><td>~6.5k+</td><td>~3.7k AU</td><td>~4k AU</td><td>~20–40</td></tr>
+    <tr><th>Multi-discipline eng.</th><td class="us yes">Yes</td><td class="yes">Yes</td><td class="no">Electrical only</td><td class="yes">Yes</td><td>Planning-led</td><td class="yes">Yes</td><td>Advisory-led</td><td>Advisory-led</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td>Elec/civil</td></tr>
+    <tr><th>Self-deliver build/fab</th><td class="us no">No</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>EPCM</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>EPCM</td><td>EPCM</td><td class="yes">EPC(M)</td><td class="no">No</td></tr>
+    <tr><th>3D scan / print</th><td class="us yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>BIM</td><td>Digital</td><td>Digital</td><td class="no">No</td></tr>
+    <tr><th>Owner's-mindset positioning</th><td class="us yes">Core</td><td>Partner-led</td><td>Contractor</td><td>Relational</td><td>Culture-led</td><td>Commercial eng.</td><td>Trusted advisor</td><td>Ex-operator</td><td>Institutional</td><td>Corporate</td><td>Corporate</td><td>Corporate</td><td>Corporate</td></tr>
+    <tr><th>Content / SEO depth</th><td class="us">Growing (94% branded)</td><td>Project-led</td><td>Case studies</td><td>Thin</td><td>Big social</td><td class="yes">Strong</td><td>Case-study</td><td>Weak</td><td class="yes">Strong</td><td class="yes">Strong</td><td class="yes">Strong</td><td class="yes">Strong</td><td>Weak</td></tr>
+    <tr><th>Direct threat</th><td class="us">—</td><td class="no">High</td><td class="no">High</td><td>Med-High</td><td>Medium</td><td>Medium</td><td>Low-Med</td><td class="yes">Low</td><td>Medium</td><td>Low-Med</td><td>Low-Med</td><td>Low-Med</td><td class="yes">Low</td></tr>
   </tbody>
 </table>
 </div>
