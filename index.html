@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waterline — Competitor Battlecards</title>
+<style>
+  :root{
+    --teal:#0d6e6e; --teal-dark:#094f4f; --yellow:#f2b705; --ink:#1c2526; --muted:#5c6b6b;
+    --line:#e2e8e8; --bg:#f7f9f9; --card:#ffffff; --red:#b3261e; --green:#1e7a3c;
+    --chip:#eef5f5; --amber:#b06a00;
+    --t-high:#b3261e; --t-med:#b06a00; --t-low:#1e7a3c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.55;font-size:15px}
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 22px 60px}
+  header.top{border-bottom:3px solid var(--yellow);padding-bottom:16px;margin-bottom:8px}
+  header.top h1{margin:0 0 4px;font-size:26px;color:var(--teal-dark)}
+  header.top .sub{color:var(--muted);font-size:14px}
+  .meta{font-size:12px;color:var(--muted);margin-top:6px}
+  h2.section{font-size:19px;color:var(--teal-dark);margin:34px 0 12px;border-left:4px solid var(--teal);padding-left:10px}
+  p.lead{background:#fff;border:1px solid var(--line);border-left:4px solid var(--yellow);padding:14px 16px;border-radius:0 8px 8px 0;margin:0 0 8px}
+
+  .tiers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .tier{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;border-top:4px solid var(--teal)}
+  .tier.t1{border-top-color:var(--red)} .tier.t2{border-top-color:var(--amber)} .tier.t3{border-top-color:var(--teal)}
+  .tier h3{margin:0 0 6px;font-size:15px;color:var(--teal-dark)}
+  .tier .who{font-size:13px;color:var(--muted);min-height:34px}
+  .tier .verdict{margin-top:10px;font-size:12.5px;padding:8px 10px;border-radius:6px;background:var(--chip)}
+
+  /* threat list */
+  .threat{display:grid;grid-template-columns:1fr;gap:8px}
+  .trow{display:grid;grid-template-columns:170px 78px 1fr;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+  .trow .nm{font-weight:600;color:var(--teal-dark);font-size:13.5px}
+  .trow .nm small{display:block;font-weight:400;color:var(--muted);font-size:11px}
+  .badge{font-size:11px;font-weight:700;text-align:center;padding:3px 6px;border-radius:5px;color:#fff}
+  .b-high{background:var(--t-high)} .b-med{background:var(--t-med)} .b-low{background:var(--t-low)}
+  .trow .win{font-size:12.5px;color:var(--ink)}
+
+  .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+  table{border-collapse:collapse;width:100%;background:#fff;font-size:12px;min-width:1180px}
+  th,td{padding:8px 9px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{background:var(--teal);color:#fff;font-weight:600;position:sticky;top:0}
+  th.dim{background:var(--teal-dark);position:sticky;left:0;z-index:2}
+  tbody th{background:#f0f6f6;color:var(--teal-dark);font-weight:600;white-space:nowrap;position:sticky;left:0}
+  thead th.us{background:var(--yellow);color:var(--ink)}
+  td.us{background:#fffdf2}
+  .yes{color:var(--green);font-weight:600}
+  .no{color:var(--red);font-weight:600}
+
+  .tabs{margin:6px 0 14px}
+  .tabgrp{margin-bottom:8px}
+  .tabgrp .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 4px}
+  .tabrow{display:flex;flex-wrap:wrap;gap:6px}
+  .tab{border:1px solid var(--line);background:#fff;color:var(--teal-dark);padding:7px 12px;border-radius:20px;
+    cursor:pointer;font-size:12.5px;font-weight:500}
+  .tab:hover{border-color:var(--teal)}
+  .tab.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+
+  .card{display:none;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .card.show{display:block}
+  .card .head{background:var(--teal-dark);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+  .card .head h3{margin:0;font-size:19px}
+  .card .head .pos{font-size:13px;opacity:.92;margin-top:3px}
+  .thpill{flex:none;font-size:11px;font-weight:700;padding:5px 9px;border-radius:6px;white-space:nowrap}
+  .card .body{padding:18px 20px}
+  .facts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .fact{background:var(--chip);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--teal-dark)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .blk h4{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  .blk.win h4{color:var(--green)} .blk.weak h4{color:var(--red)}
+  ul{margin:0 0 12px;padding-left:18px} li{margin-bottom:5px}
+  .pitch{font-style:italic;background:#f4faf9;border-left:3px solid var(--teal);padding:8px 12px;border-radius:0 6px 6px 0;margin:0 0 14px}
+  .obj{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px}
+  .obj td{border:1px solid var(--line);padding:8px 10px}
+  .obj td:first-child{width:42%;background:#fafbfb;font-weight:500}
+
+  .diff{border:2px solid var(--yellow);border-radius:12px;padding:18px 20px;background:#fff}
+  .diff ul{padding-left:18px} .diff li{margin-bottom:8px}
+  footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+  @media(max-width:760px){.tiers,.grid2{grid-template-columns:1fr}.trow{grid-template-columns:1fr 70px;}.trow .win{grid-column:1/3}}
+  @media print{.tab,.tabs{display:none}.card{display:block!important;page-break-inside:avoid;margin-bottom:16px}body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>Waterline — Competitor Battlecards</h1>
+  <div class="sub">Sales &amp; marketing reference · QLD/NSW resources engineering market · 11 competitors</div>
+  <div class="meta">Research date: June 2026 · Tabs grouped by tier · Click a competitor · Prints clean to PDF · Refresh quarterly</div>
+</header>
+
+<h2 class="section">Executive summary</h2>
+<p class="lead">The field splits into three tiers, and Waterline competes differently in each. <strong>The daily fight is Tier 1</strong> — Mackay-based rivals on the same turf (Key Solutions Group, Cell Engineering, Orana). <strong>Tier 2</strong> is Brisbane/national specialists and advisories who out-scale or out-publish Waterline but lack coalfields proximity. <strong>Tier 3</strong> is the global engineering giants (Aurecon, AECOM, Worley, SRK) — they only collide with Waterline on larger capital projects, and they're expensive, slow to mobilise, and not focused on mid-tier QLD coal. Waterline's ownable wedge is constant across all three: <strong>owner's mindset + genuine Mackay-and-Brisbane presence + in-house 3D scanning/printing + senior attention at a fair price.</strong> Biggest direct threats: <strong>Key Solutions Group</strong> (design + build + 3D, same town) and <strong>Cell Engineering</strong> (Mackay HQ, same tier-1 clients). Biggest open lane: <strong>content/SEO</strong> — only SRK and the giants publish seriously, and none own the local QLD topical terms.</p>
+
+<h2 class="section">The three tiers</h2>
+<div class="tiers">
+  <div class="tier t1">
+    <h3>Tier 1 — Regional rivals</h3>
+    <div class="who">Key Solutions Group · Cell Engineering · Orana Engineering</div>
+    <div class="verdict">Same turf, SME scale, real coalfields presence. The everyday competition. Win on multi-discipline breadth, owner's-mindset advisory, Brisbane+Mackay reach, and content.</div>
+  </div>
+  <div class="tier t2">
+    <h3>Tier 2 — Specialists &amp; advisories</h3>
+    <div class="who">MEC Mining · Wave International · Palaris · Enable Advisory</div>
+    <div class="verdict">Brisbane/national, more scale or polish, but head-office-centric and often advisory-led. Win on coalfields proximity, hands-on delivery, 3D, and senior responsiveness.</div>
+  </div>
+  <div class="tier t3">
+    <h3>Tier 3 — Global giants</h3>
+    <div class="who">Aurecon · AECOM · Worley · SRK Consulting</div>
+    <div class="verdict">Out-credential and out-publish everyone. But expensive, slow, mega-project-biased, and not focused on mid-tier QLD coal. Win on cost, agility, attention, and localism.</div>
+  </div>
+</div>
+
+<h2 class="section">Threat read — who to worry about</h2>
+<div class="threat">
+  <div class="trow"><div class="nm">Key Solutions Group<small>Tier 1 · Mackay</small></div><div class="badge b-high">HIGH</div><div class="win">Same town, 3D overlap, can engineer <em>and</em> build. Counter with advisory depth + Brisbane reach + blue-chip refs.</div></div>
+  <div class="trow"><div class="nm">Cell Engineering<small>Tier 1 · Mackay</small></div><div class="badge b-high">HIGH</div><div class="win">Mackay HQ, same tier-1 clients — but electrical-only. Counter with multi-discipline breadth + 3D + owner mindset.</div></div>
+  <div class="trow"><div class="nm">Orana Engineering<small>Tier 1 · Townsville/Mackay</small></div><div class="badge b-med">MED-HIGH</div><div class="win">Tier-1 roster, but dated site, satellite Mackay, no self-delivery. Counter with modern brand + content + capital advisory.</div></div>
+  <div class="trow"><div class="nm">Wave International<small>Tier 2 · Perth/Brisbane</small></div><div class="badge b-med">MEDIUM</div><div class="win">Polished, full-lifecycle, strong content — but Perth-centric, Brisbane CBD only, no 3D. Counter with local proximity + reality-capture.</div></div>
+  <div class="trow"><div class="nm">MEC Mining<small>Tier 2 · Brisbane</small></div><div class="badge b-med">MEDIUM</div><div class="win">Scale + huge social + training arm, but planning/geology-led. Counter with site/operational delivery + coalfields proximity.</div></div>
+  <div class="trow"><div class="nm">SRK Consulting<small>Tier 3 · global</small></div><div class="badge b-med">MEDIUM</div><div class="win">Deep content + bankable-report authority. Counter with responsiveness, value, partner attention on mid-tier work.</div></div>
+  <div class="trow"><div class="nm">Palaris<small>Tier 2 · Newcastle</small></div><div class="badge b-low">LOW-MED</div><div class="win">Independent financial/technical advisory, NSW-based. Counter with QLD localism + actual engineering delivery.</div></div>
+  <div class="trow"><div class="nm">Aurecon<small>Tier 3 · APAC giant</small></div><div class="badge b-low">LOW-MED</div><div class="win">Only collides on big capital jobs. Expensive, no Mackay base. Counter with cost, agility, owner mindset.</div></div>
+  <div class="trow"><div class="nm">AECOM<small>Tier 3 · global giant</small></div><div class="badge b-low">LOW-MED</div><div class="win">Mining isn't an AU priority (infra-led). Has a Mackay office but it's one cog. Counter with resources focus + speed.</div></div>
+  <div class="trow"><div class="nm">Worley<small>Tier 3 · EPCM giant</small></div><div class="badge b-low">LOW-MED</div><div class="win">Mega-project + energy-transition bias; small jobs deprioritised. Counter with mid-tier focus + sustaining-capital value.</div></div>
+  <div class="trow"><div class="nm">Enable Advisory<small>Tier 2 · Brisbane</small></div><div class="badge b-low">LOW</div><div class="win">Tiny ex-CEO advisory boutique, no delivery arm. Counter with engineering execution + capacity + Mackay presence.</div></div>
+</div>
+
+<h2 class="section">Comparison matrix (scroll →)</h2>
+<div class="scroll">
+<table>
+  <thead>
+    <tr>
+      <th class="dim">Dimension</th>
+      <th class="us">Waterline</th>
+      <th>Key Solutions</th>
+      <th>Cell Eng.</th>
+      <th>Orana</th>
+      <th>MEC Mining</th>
+      <th>Wave Int'l</th>
+      <th>Palaris</th>
+      <th>Enable</th>
+      <th>SRK (AU)</th>
+      <th>Aurecon</th>
+      <th>AECOM</th>
+      <th>Worley</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><th>Tier</th><td class="us">—</td><td>1</td><td>1</td><td>1</td><td>2</td><td>2</td><td>2</td><td>2</td><td>3</td><td>3</td><td>3</td><td>3</td></tr>
+    <tr><th>QLD base</th><td class="us">Brisbane + Mackay</td><td>Mackay</td><td>Mackay + Bris</td><td>Mackay (sat.)</td><td>Brisbane</td><td>Brisbane CBD</td><td>—</td><td>Brisbane</td><td>Brisbane</td><td>Bris/Gladstone</td><td>Bris + Mackay</td><td>Bris/Gladstone</td></tr>
+    <tr><th>Mackay/coalfields</th><td class="us yes">Yes</td><td class="yes">Yes (HQ)</td><td class="yes">Yes (HQ)</td><td>Satellite</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>Office</td><td class="no">No</td></tr>
+    <tr><th>Scale</th><td class="us">Growing SME</td><td>~28+</td><td>11–50</td><td>Mature SME</td><td>~200</td><td>Mid multinat'l</td><td>~100–250</td><td>Tiny</td><td>100+ AU</td><td>~6.5k+</td><td>~3.7k AU</td><td>~4k AU</td></tr>
+    <tr><th>Multi-discipline eng.</th><td class="us yes">Yes</td><td class="yes">Yes</td><td class="no">Electrical only</td><td class="yes">Yes</td><td>Planning-led</td><td class="yes">Yes</td><td>Advisory-led</td><td>Advisory-led</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+    <tr><th>Self-deliver build/fab</th><td class="us no">No</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>EPCM</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>EPCM</td><td>EPCM</td><td class="yes">EPC(M)</td></tr>
+    <tr><th>3D scan / print</th><td class="us yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>BIM</td><td>Digital</td><td>Digital</td></tr>
+    <tr><th>Owner's-mindset positioning</th><td class="us yes">Core</td><td>Partner-led</td><td>Contractor</td><td>Relational</td><td>Culture-led</td><td>Commercial eng.</td><td>Trusted advisor</td><td>Ex-operator</td><td>Institutional</td><td>Corporate</td><td>Corporate</td><td>Corporate</td></tr>
+    <tr><th>Content / SEO depth</th><td class="us">Growing (94% branded)</td><td>Project-led</td><td>Case studies</td><td>Thin</td><td>Big social</td><td class="yes">Strong</td><td>Case-study</td><td>Weak</td><td class="yes">Strong</td><td class="yes">Strong</td><td class="yes">Strong</td><td class="yes">Strong</td></tr>
+    <tr><th>Direct threat</th><td class="us">—</td><td class="no">High</td><td class="no">High</td><td>Med-High</td><td>Medium</td><td>Medium</td><td>Low-Med</td><td class="yes">Low</td><td>Medium</td><td>Low-Med</td><td>Low-Med</td><td>Low-Med</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 class="section">Battlecards</h2>
+<div class="tabs" id="tabs">
+  <div class="tabgrp"><div class="lbl">Tier 1 — regional rivals</div><div class="tabrow">
+    <button class="tab active" data-t="ksg">Key Solutions Group</button>
+    <button class="tab" data-t="cell">Cell Engineering</button>
+    <button class="tab" data-t="orana">Orana Engineering</button>
+  </div></div>
+  <div class="tabgrp"><div class="lbl">Tier 2 — specialists &amp; advisories</div><div class="tabrow">
+    <button class="tab" data-t="mec">MEC Mining</button>
+    <button class="tab" data-t="wave">Wave International</button>
+    <button class="tab" data-t="palaris">Palaris</button>
+    <button class="tab" data-t="enable">Enable Advisory</button>
+  </div></div>
+  <div class="tabgrp"><div class="lbl">Tier 3 — global giants</div><div class="tabrow">
+    <button class="tab" data-t="srk">SRK Consulting</button>
+    <button class="tab" data-t="aurecon">Aurecon</button>
+    <button class="tab" data-t="aecom">AECOM</button>
+    <button class="tab" data-t="worley">Worley</button>
+  </div></div>
+</div>
+
+<!-- KSG -->
+<div class="card show" id="ksg">
+  <div class="head"><div><h3>Key Solutions Group (KSG)</h3><div class="pos">Mackay end-to-end specialist: design → draft → RPEQ → fabricate → install. The most direct head-to-head.</div></div><span class="thpill b-high" style="color:#fff">THREAT: HIGH</span></div>
+  <div class="body">
+    <div class="facts"><span class="fact">Mackay (Paget)</span><span class="fact">Since 2007</span><span class="fact">~28+ staff</span><span class="fact">Mining · ports · sugar · water</span><span class="fact">~820 LinkedIn</span></div>
+    <div class="pitch">"Your Future. Projects, People, Problems Solved." — Zero-harm, on-time, on-budget. "The KSG Difference."</div>
+    <div class="grid2">
+      <div class="blk win"><h4>Where they genuinely win</h4><ul>
+        <li>True single-vendor: they engineer <em>and</em> physically build (fab, field, civil, electrical arms)</li>
+        <li>Direct 3D scanning &amp; printing — overlaps Waterline's signature</li>
+        <li>$500k Qld grant for welding robotics → modern automated fab</li>
+        <li>Strong named-project portfolio; modern brand; paid retargeting</li>
+      </ul></div>
+      <div class="blk weak"><h4>Where they're vulnerable</h4><ul>
+        <li>Single location (Mackay only) — no Brisbane / no advisory front door</li>
+        <li>Trades/fabrication-heavy; lighter on senior consulting-engineering depth</li>
+        <li>Broad sector spread dilutes mining specialisation</li>
+        <li>Stale site hygiene (footer ©2020); no editorial content</li>
+      </ul></div>
+    </div>
+    <div class="blk"><h4>How Waterline wins</h4><ul>
+      <li><strong>Advisory + capital + operational depth</strong> with an owner's mindset, not just build-to-spec fabrication</li>
+      <li><strong>Brisbane HQ + Mackay</strong> — corporate access AND coalfields proximity</li>
+      <li><strong>Blue-chip credibility</strong>: Stanmore, Anglo American, BHP, Komatsu</li>
+      <li><strong>24-hour drafting turnaround</strong> as a productised service</li>
+    </ul></div>
+    <div class="blk"><h4>Objection handling</h4>
+      <table class="obj">
+        <tr><td>"KSG can fabricate and install — you can't."</td><td>True for trades-led jobs. For complex multi-discipline engineering, owner's-engineer representation and capital advisory, you want an independent partner thinking like the owner — and we bring in fabricators when build is needed.</td></tr>
+        <tr><td>"They do 3D printing too."</td><td>So do we — proven on the BHP dragline scale-model work. The difference is we wrap it in full engineering context, not a standalone scan-and-print.</td></tr>
+        <tr><td>"They're local to Mackay."</td><td>So are we — Mackay office <em>and</em> Brisbane HQ, so you get site responsiveness plus head-office reach.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CELL -->
+<div class="card" id="cell">
+  <div class="head"><div><h3>Cell Engineering</h3><div class="pos">Mackay-HQ specialist electrical engineering consultancy (HV/LV, hazardous area, functional safety, OT). Same turf, same clients.</div></div><span class="thpill b-high" style="color:#fff">THREAT: HIGH</span></div>
+  <div class="body">
+    <div class="facts"><span class="fact">Mackay HQ + Bris/Darwin/Gladstone/Newcastle</span><span class="fact">Since 2005</span><span class="fact">11–50 staff</span><span class="fact">South32 · Glencore · INPEX · DoD</span></div>
+    <div class="pitch">"Electrical Engineering Australia — leading experts with 20+ years." "Our Journey of ExCELLence."</div>
+    <div class="grid2">
+      <div class="blk win"><h4>Where they genuinely win</h4><ul>
+        <li>Mackay HQ + multi-office (Bowen Basin + NT) — deep local presence</li>
+        <li>Deep electrical/HV/OT specialisation; in-house test gear; training arm</li>
+        <li>Tier-1 client roster (South32, Glencore, INPEX, ConocoPhillips, Defence)</li>
+        <li>Strong, filterable project case-study library</li>
+      </ul></div>
+      <div class="blk weak"><h4>Where they're vulnerable</h4><ul>
+        <li><strong>Single-discipline (electrical only)</strong> — no civil/structural/mechanical</li>
+        <li>No 3D scanning/printing or reality capture</li>
+        <li>Templated/generic web copy (US spelling) undercuts premium positioning</li>
+        <li>Thin thought leadership; "contractor/auditor" feel vs. engineering partner</li>
+      </ul></div>
+    </div>
+    <div class="blk"><h4>How Waterline wins</h4><ul>
+      <li><strong>Multi-discipline breadth</strong> — electrical PLUS mechanical, civil &amp; structural under one roof</li>
+      <li><strong>3D scanning &amp; printing / reality capture</strong> they don't offer</li>
+      <li><strong>Owner's-mindset partner</strong> positioning vs. compliance-auditor framing</li>
+      <li><strong>Capital projects + advisory</strong>, not just electrical audits</li>
+    </ul></div>
+    <div class="blk"><h4>Objection handling</h4>
+      <table class="obj">
+        <tr><td>"Cell are the electrical experts in Mackay."</td><td>They're strong on electrical. The catch is electrical is all they do — most site problems are multi-discipline. We deliver electrical alongside mechanical, civil and structural, so you don't have to coordinate three firms.</td></tr>
+        <tr><td>"They work with South32 and Glencore."</td><td>So do we, at the same tier — Stanmore, Anglo, BHP. And we add 3D reality-capture and an owner's mindset across all disciplines.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ORANA -->
+<div class="card" id="orana">
+  <div class="head"><div><h3>Orana Engineering</h3><div class="pos">Multi-discipline brownfield consultancy that embeds as a site's outsourced engineering department. Strong tier-1 roster.</div></div><span class="thpill b-med" style="color:#fff">THREAT: MED-HIGH</span></div>
+  <div class="body">
+    <div class="facts"><span class="fact">Townsville HQ + Mackay + Chinchilla</span><span class="fact">Mature SME</span><span class="fact">ISO 9001/14001, RPEQ</span><span class="fact">~860 LinkedIn</span></div>
+    <div class="pitch">"Real experience, real results." — brownfield engineering on time and budget; "call us any day or night."</div>
+    <div class="grid2">
+      <div class="blk win"><h4>Where they genuinely win</h4><ul>
+        <li>Tier-1 client roster (BHP, Rio, Glencore, Anglo, South32, Peabody, Yancoal)</li>
+        <li>Three-office QLD coverage + mature local SEO</li>
+        <li>Full ISO + RPEQ; structured graduate program</li>
+        <li>Owns the "drawing management" niche</li>
+      </ul></div>
+      <div class="blk weak"><h4>Where they're vulnerable</h4><ul>
+        <li>Dated, text-dense site; weak/no fresh content</li>
+        <li>Modest social reach; relational not modern brand</li>
+        <li>No self-delivery (pure consultancy)</li>
+        <li>Mackay is a satellite, not a HQ</li>
+      </ul></div>
+    </div>
+    <div class="blk"><h4>How Waterline wins</h4><ul>
+      <li><strong>Modern brand + 3D/innovation story</strong> vs. dated digital presence</li>
+      <li><strong>Owner's-mindset advisory + capital projects</strong>, not just brownfield drafting</li>
+      <li><strong>Content/SEO lane</strong> — out-publish on RS23, machinery safety, 3D printing</li>
+      <li><strong>Brisbane HQ</strong> for corporate/capital decision-makers</li>
+    </ul></div>
+    <div class="blk"><h4>Objection handling</h4>
+      <table class="obj">
+        <tr><td>"Orana has BHP, Rio, Glencore..."</td><td>We hold the same calibre — Stanmore, Anglo, BHP, Komatsu — plus an owner's mindset and modern capability like 3D scanning that complements traditional drafting.</td></tr>
+        <tr><td>"They've got three offices."</td><td>Their Mackay site is a satellite. Ours is a genuine base alongside Brisbane HQ — closer day-to-day to coalfields operations.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MEC -->
+<div class="card" id="mec">
+  <div class="head"><div><h3>MEC Mining</h3><div class="pos">Global technical mining consultancy (est. 2005), whole-of-lifecycle advisory across coal &amp; minerals. Scale + a training academy.</div></div><span class="thpill b-med" style="color:#fff">THREAT: MEDIUM</span></div>
+  <div class="body">
+    <div class="facts"><span class="fact">Brisbane + Perth</span><span class="fact">Est. 2005</span><span class="fact">~200 staff</span><span class="fact">~91k LinkedIn</span><span class="fact">Rebrand 2026</span></div>
+    <div class="pitch">"We are MEC" — empower clients to unlock the full potential of their mining assets while driving positive community change.</div>
+    <div class="grid2">
+      <div class="blk win"><h4>Where they genuinely win</h4><ul>
+        <li>Scale + lifecycle breadth (geology, resource estimation, planning, geotech, permitting)</li>
+        <li>Very large LinkedIn reach + strong employer brand</li>
+        <li>Distinct training/academy arm</li>
+        <li>20-year multi-commodity track record</li>
+      </ul></div>
+      <div class="blk weak"><h4>Where they're vulnerable</h4><ul>
+        <li>Mine-planning/geology focus — not site/operational engineering delivery</li>
+        <li>Mid-rebrand (2026) may create inconsistency</li>
+        <li>Big-social, light-editorial — thin deep thought leadership</li>
+        <li>No Mackay office; no fabrication/field delivery</li>
+      </ul></div>
+    </div>
+    <div class="blk"><h4>How Waterline wins</h4><ul>
+      <li><strong>Hands-on site &amp; capital engineering</strong> vs. study/planning orientation</li>
+      <li><strong>Coalfields proximity</strong> (Mackay) for responsiveness</li>
+      <li><strong>Owner's-mindset, partner-level attention</strong> vs. a 200-person shop</li>
+      <li><strong>Multi-discipline execution</strong> on real assets</li>
+    </ul></div>
+    <div class="blk"><h4>Objection handling</h4>
+      <table class="obj">
+        <tr><td>"MEC is much bigger."</td><td>Scale cuts both ways — with us you get senior engineers on your job, not juniors, and faster mobilisation. For mine planning at scale they're strong; for site/operational and capital delivery, we're built for it.</td></tr>
+        <tr><td>"They have huge reach / brand."</td><td>Reach isn't delivery. Our references — Stanmore, Anglo, BHP — speak to outcomes on the ground.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- WAVE -->
+<div class="card" id="wave">
+  <div class="head"><div><h3>Wave International</h3><div class="pos">25-year "resource development consultancy" — full-lifecycle engineering, studies, EPCM and asset management. Polished, content-mature.</div></div><span class="thpill b-med" style="color:#fff">THREAT: MEDIUM</span></div>
+  <div class="body">
+    <div class="facts"><span class="fact">Perth HQ + Brisbane CBD + Melbourne</span><span class="fact">Founded 1999</span><span class="fact">Mid multinational</span><span class="fact">Intl: Mongolia, Netherlands, Canada, India</span></div>
+    <div class="pitch">"Creating a more resourceful world." Signature method: "Commercial Engineering" — value-focused, full lifecycle.</div>
+    <div class="grid2">
+      <div class="blk win"><h4>Where they genuinely win</h4><ul>
+        <li>25-yr track record; full-lifecycle EPCM capability</li>
+        <li>Battery/critical-minerals positioning ("old + new worlds")</li>
+        <li>Mature marketing engine — blog, thought-leadership PDFs, case studies</li>
+        <li>International footprint; ISO-certified; junior + blue-chip project list</li>
+      </ul></div>
+      <div class="blk weak"><h4>Where they're vulnerable</h4><ul>
+        <li>Perth-centric — QLD is a Brisbane-CBD satellite, no Mackay/Bowen Basin presence</li>
+        <li>Broad/generalist (agribusiness, water, infra) vs. deep regional specialisation</li>
+        <li>Larger-firm overheads / slower turnaround</li>
+        <li>No visible 3D scanning/printing — a gap Waterline owns</li>
+      </ul></div>
+    </div>
+    <div class="blk"><h4>How Waterline wins</h4><ul>
+      <li><strong>On-the-ground QLD/Mackay presence</strong> vs. their CBD-only footprint</li>
+      <li><strong>Nimbleness + senior attention</strong> vs. multinational overhead</li>
+      <li><strong>3D scanning &amp; printing / reality capture</strong> they don't offer</li>
+      <li><strong>Owner's mindset</strong> vs. broad "commercial engineering" generalism</li>
+    </ul></div>
+    <div class="blk"><h4>Objection handling</h4>
+      <table class="obj">
+        <tr><td>"Wave is a polished, full-lifecycle firm."</td><td>They are — for Perth-led, big-study work. For QLD coal operations needing fast, hands-on engineering, we're on the ground in Mackay, not flying in from a CBD office.</td></tr>
+        <tr><td>"They publish great thought leadership."</td><td>Good content, but it's national/generic. We're building authority on the specific QLD topics your team searches — RS23, machinery safety, hazardous area — and we back it with 3D reality capture.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PALARIS -->
+<div class="card" id="palaris">
+  <div class="head"><div><h3>Palaris</h3><div class="pos">Global independent mining advisory bridging the technical–commercial gap; strong in finance/lender's technical advisor work.</div></div><span class="thpill b-low" style="color:#fff">THREAT: LOW-MED</span></div>
+  <div class="body">
+    <div class="facts"><span class="fact">Newcastle NSW HQ</span><span class="fact">Est. 2000</span><span class="fact">~100–250 staff</span><span class="fact">~4.8k LinkedIn</span><span class="fact">AU/UK/SA/Canada</span></div>
+    <div class="pitch">"Your Trusted Advisor" — "make the right decisions, first time, every time." Balancing value &amp; risk.</div>
+    <div class="grid2">
+      <div class="blk win"><h4>Where they genuinely win</h4><ul>
+        <li>Independent financial + technical advisory (due diligence, ITRs, valuations)</li>
+        <li>25-year, multi-country track record (5,000+ projects claimed)</li>
+        <li>Decarbonisation pathway positioning</li>
+        <li>Strong case-study evidence base</li>
+      </ul></div>
+      <div class="blk weak"><h4>Where they're vulnerable</h4><ul>
+        <li>NSW (Newcastle)-centred — weak in QLD/Mackay backyard</li>
+        <li>Finance/advisory lean — less site/operational delivery</li>
+        <li>Small social reach; thin ongoing content cadence</li>
+        <li>Brand leans heavily on the founder</li>
+      </ul></div>
+    </div>
+    <div class="blk"><h4>How Waterline wins</h4><ul>
+      <li><strong>QLD-local, coalfields-embedded</strong> vs. NSW base</li>
+      <li><strong>Operational + capital engineering delivery</strong>, not just advisory/ITRs</li>
+      <li><strong>Owner's mindset on the asset</strong>, not arm's-length financial review</li>
+    </ul></div>
+    <div class="blk"><h4>Objection handling</h4>
+      <table class="obj">
+        <tr><td>"Palaris does independent technical reviews."</td><td>For bankable/financier reviews they fit. For owners who need engineering delivered on site in QLD, we're closer, faster and hands-on — thinking like the owner, not the lender.</td></tr>
+        <tr><td>"They're global."</td><td>Global head office, NSW base. Your asset is in the Bowen Basin — we're there.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ENABLE -->
+<div class="card" id="enable">
+  <div class="head"><div><h3>Enable Advisory</h3><div class="pos">Boutique Brisbane advisory of former mining CEOs/executives who take hands-on accountability for difficult projects.</div></div><span class="thpill b-low" style="color:#fff">THREAT: LOW</span></div>
+  <div class="body">
+    <div class="facts"><span class="fact">Brisbane only</span><span class="fact">~2015/16</span><span class="fact">Tiny boutique</span><span class="fact">~153 LinkedIn</span><span class="fact">Coal/QLD-NSW</span></div>
+    <div class="pitch">"Dig Deeper." — Former CEOs &amp; senior executives ourselves; we represent owner/CEO interests.</div>
+    <div class="grid2">
+      <div class="blk win"><h4>Where they genuinely win</h4><ul>
+        <li>Elite operator credibility ("we've been in your seat")</li>
+        <li>Proprietary tools: Accumine, Coal Tenure DB — hard to replicate</li>
+        <li>Strong C-suite trust; accountability over advice</li>
+      </ul></div>
+      <div class="blk weak"><h4>Where they're vulnerable</h4><ul>
+        <li>Tiny footprint; key-person dependent; limited capacity</li>
+        <li>Advisory, not multi-discipline engineering delivery</li>
+        <li>Single office, no Mackay/site presence</li>
+        <li>Stale website + minimal digital reach (©2016)</li>
+      </ul></div>
+    </div>
+    <div class="blk"><h4>How Waterline wins</h4><ul>
+      <li><strong>Actual engineering execution</strong>, not boardroom advice only</li>
+      <li><strong>Capacity + multi-discipline team</strong> vs. a handful of partners</li>
+      <li><strong>Mackay site presence</strong> for hands-on delivery</li>
+      <li><strong>Modern, growing digital presence</strong></li>
+    </ul></div>
+    <div class="blk"><h4>Objection handling</h4>
+      <table class="obj">
+        <tr><td>"Enable's people are ex-CEOs."</td><td>Great for top-level strategy. But strategy needs delivery — we bring senior engineers who execute the capital and operational work, with the same owner's mindset and the team capacity to do it.</td></tr>
+        <tr><td>"They have Accumine / tenure data."</td><td>Useful planning tools. We engineer the asset itself — design, capital, operations — where value is built and protected.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- SRK -->
+<div class="card" id="srk">
+  <div class="head"><div><h3>SRK Consulting (Australia)</h3><div class="pos">Global, employee-owned technical consultancy — exploration to closure, all commodities. The credentialled heavyweight.</div></div><span class="thpill b-med" style="color:#fff">THREAT: MEDIUM</span></div>
+  <div class="body">
+    <div class="facts"><span class="fact">5 AU offices incl. Brisbane</span><span class="fact">AU since 1994</span><span class="fact">100+ AU / 1,600+ global</span><span class="fact">Independent / employee-owned</span></div>
+    <div class="pitch">"Mining &amp; Exploration Consultants" — focused advice across the entire life cycle, exploration to closure.</div>
+    <div class="grid2">
+      <div class="blk win"><h4>Where they genuinely win</h4><ul>
+        <li>Brand authority + independence for bankable/IPO technical reports</li>
+        <li>Full multidisciplinary bench (geology, geotech, water, tailings, metallurgy, closure)</li>
+        <li>Deep content/SEO: publications, insights, technical papers, training</li>
+        <li>Global expertise transfer; high-authority website</li>
+      </ul></div>
+      <div class="blk weak"><h4>Where they're vulnerable</h4><ul>
+        <li>Big-firm overhead — higher cost, slower mobilisation</li>
+        <li>Generalist global brand, not a QLD coal-region specialist</li>
+        <li>Brisbane is 1 of 5 AU offices — no Mackay/Bowen Basin proximity</li>
+        <li>Smaller operators can feel like low-priority accounts</li>
+      </ul></div>
+    </div>
+    <div class="blk"><h4>How Waterline wins</h4><ul>
+      <li><strong>Responsiveness + partner-level attention</strong> on mid-tier work</li>
+      <li><strong>Coalfields proximity</strong> and relationship continuity</li>
+      <li><strong>Better value</strong> vs. global-firm rates</li>
+      <li><strong>Owner's mindset</strong> vs. institutional delivery</li>
+    </ul></div>
+    <div class="blk"><h4>Objection handling</h4>
+      <table class="obj">
+        <tr><td>"SRK is the global name."</td><td>For bankable reports and exploration-to-closure breadth they're strong. For capital and operational engineering delivered responsively in the Bowen Basin, you don't need global overhead — you need a senior local team that treats your asset like its own.</td></tr>
+        <tr><td>"They have every discipline."</td><td>And we have the disciplines that matter for your site — electrical, mechanical, civil &amp; structural — delivered faster and closer, without being a small account in a big book.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- AURECON -->
+<div class="card" id="aurecon">
+  <div class="head"><div><h3>Aurecon</h3><div class="pos">Large APAC engineering, design &amp; advisory firm — "bringing ideas to life" across infrastructure, energy and resources.</div></div><span class="thpill b-low" style="color:#fff">THREAT: LOW-MED</span></div>
+  <div class="body">
+    <div class="facts"><span class="fact">Melbourne HQ + Brisbane/Gladstone/Robina</span><span class="fact">Formed 2009</span><span class="fact">~6,500+ staff</span><span class="fact">~$1.4B rev (est.)</span><span class="fact">~356k LinkedIn</span></div>
+    <div class="pitch">"Bringing ideas to life." — imagine and co-create a better future for people and the planet.</div>
+    <div class="grid2">
+      <div class="blk win"><h4>Where they genuinely win</h4><ul>
+        <li>Brand prestige, balance-sheet, bonding capacity for mega-projects</li>
+        <li>Multidisciplinary depth + digital engineering/BIM + ESG credentials</li>
+        <li>Government/defence relationships; recent award wins</li>
+        <li>Dedicated Resources market practice + strong content engine</li>
+      </ul></div>
+      <div class="blk weak"><h4>Where they're vulnerable</h4><ul>
+        <li>Large-firm rate cards — uncompetitive on mid-sized scopes</li>
+        <li>Process-heavy, slower to mobilise</li>
+        <li>No Mackay/Bowen Basin base (Brisbane/Gold Coast/Gladstone only)</li>
+        <li>Corporate, not owner-operator; mid-tier clients risk junior teams</li>
+      </ul></div>
+    </div>
+    <div class="blk"><h4>How Waterline wins</h4><ul>
+      <li><strong>Cost &amp; value</strong> on mid-tier capital/operational work</li>
+      <li><strong>Speed + agility</strong> vs. process-heavy mobilisation</li>
+      <li><strong>Coalfields proximity</strong> and everyday site presence</li>
+      <li><strong>Owner's mindset + partner continuity</strong></li>
+    </ul></div>
+    <div class="blk"><h4>Objection handling</h4>
+      <table class="obj">
+        <tr><td>"Aurecon is a top-tier name."</td><td>For mega-projects and government work, absolutely. For mid-tier resources engineering, that scale means higher rates, slower mobilisation, and you being a small account. We give senior attention, fast, at the coalface.</td></tr>
+        <tr><td>"They can do everything."</td><td>They can — at enterprise scale and price. For the work your site needs day-to-day, a nimble local team treating your asset as its own delivers better value.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- AECOM -->
+<div class="card" id="aecom">
+  <div class="head"><div><h3>AECOM (Australia)</h3><div class="pos">World's largest infrastructure consulting firm — NYSE-listed, ~50k people. In AU, infrastructure/transport-led; mining is a global side-line.</div></div><span class="thpill b-low" style="color:#fff">THREAT: LOW-MED</span></div>
+  <div class="body">
+    <div class="facts"><span class="fact">Brisbane + Mackay office</span><span class="fact">~3,700 AU / ~50k global</span><span class="fact">NYSE: ACM · ~US$16B rev</span><span class="fact">~2.3M LinkedIn (global)</span></div>
+    <div class="pitch">"The world's trusted infrastructure consulting firm." Mining sub-line: "the transition to clean energy starts beneath the surface."</div>
+    <div class="grid2">
+      <div class="blk win"><h4>Where they genuinely win</h4><ul>
+        <li>Scale, balance-sheet, brand trust, multidisciplinary bench</li>
+        <li>Marquee references (Brisbane 2032, Sydney Metro West, MCG)</li>
+        <li>Global tailings/water/ESG specialists; financial stability</li>
+        <li>Heavy content engine + podcast + huge social reach</li>
+      </ul></div>
+      <div class="blk weak"><h4>Where they're vulnerable</h4><ul>
+        <li><strong>Mining isn't an AU priority</strong> — story is transport/water/energy</li>
+        <li>Global rate cards &amp; corporate overhead; slow, bureaucratic</li>
+        <li>Mid-tier resources clients sit behind mega-projects</li>
+        <li>Strategic distraction (AI restructuring, Construction Mgmt review)</li>
+      </ul></div>
+    </div>
+    <div class="blk"><h4>How Waterline wins</h4><ul>
+      <li><strong>Resources focus</strong> — it's our core, not a global side-line</li>
+      <li><strong>Speed + low overhead</strong> vs. a global machine</li>
+      <li><strong>Everyday Bowen Basin presence</strong> vs. one office in 50k staff</li>
+      <li><strong>Owner's mindset</strong> vs. institutional/ESG-led voice</li>
+    </ul></div>
+    <div class="blk"><h4>Objection handling</h4>
+      <table class="obj">
+        <tr><td>"AECOM has a Mackay office too."</td><td>They do — but mining isn't their Australian focus; their story is transport, water and the Olympics. We're a resources-first firm where your project is the priority, not a small line in a global book.</td></tr>
+        <tr><td>"They're the biggest in the world."</td><td>Size helps on mega-infrastructure. For mid-tier mine engineering you want responsiveness and value, not global overhead and layered approvals.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- WORLEY -->
+<div class="card" id="worley">
+  <div class="head"><div><h3>Worley</h3><div class="pos">Global, ASX-listed energy/chemicals/resources EPCM giant — Australian-founded 50+ years ago. Mega-project + energy-transition focus.</div></div><span class="thpill b-low" style="color:#fff">THREAT: LOW-MED</span></div>
+  <div class="body">
+    <div class="facts"><span class="fact">11 AU offices: Brisbane + Gladstone +…</span><span class="fact">~4k AU / ~45k global</span><span class="fact">ASX: WOR · ~A$11–12B rev</span><span class="fact">~1.69M LinkedIn</span></div>
+    <div class="pitch">"Delivering a more sustainable world." AU heritage-led: "an Australian company founded more than 50 years ago."</div>
+    <div class="grid2">
+      <div class="blk win"><h4>Where they genuinely win</h4><ul>
+        <li>Brand + balance-sheet scale; end-to-end EPCM + construction</li>
+        <li>Entrenched major-operator relationships (e.g. Rio Tinto Pilbara, 25 yrs)</li>
+        <li>Global resource pool + sustainability/energy-transition credibility</li>
+        <li>QLD presence (Brisbane + Gladstone); heavy thought-leadership engine</li>
+      </ul></div>
+      <div class="blk weak"><h4>Where they're vulnerable</h4><ul>
+        <li>Corporate rate cards — small/mid sustaining-capital jobs uneconomic/low-priority</li>
+        <li>Scale bias toward multi-billion-dollar mega-projects</li>
+        <li>No Mackay/Bowen Basin coalfields office</li>
+        <li>Energy-transition pivot (75% sustainable revenue goal) dilutes coal focus</li>
+      </ul></div>
+    </div>
+    <div class="blk"><h4>How Waterline wins</h4><ul>
+      <li><strong>Mid-tier &amp; sustaining-capital focus</strong> — the work they deprioritise</li>
+      <li><strong>Owner-level attention + speed</strong> vs. layered global delivery</li>
+      <li><strong>Coalfields proximity</strong> for regional QLD coal jobs</li>
+      <li><strong>Committed to traditional resources clients</strong>, not pivoting away</li>
+    </ul></div>
+    <div class="blk"><h4>Objection handling</h4>
+      <table class="obj">
+        <tr><td>"Worley is a world-class EPCM firm."</td><td>For multi-billion-dollar programs, yes. For sustaining capital and mid-tier site engineering, those jobs are low-priority in a global EPCM machine — exactly the work we're built to deliver fast and well.</td></tr>
+        <tr><td>"They're Australian and huge."</td><td>And increasingly focused on energy transition and mega-projects. If you want a partner squarely focused on your QLD coal operation, treating it like our own, that's us.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<h2 class="section">Waterline's differentiators to lead with</h2>
+<div class="diff">
+  <ul>
+    <li><strong>Owner's mindset</strong> — "we treat your assets like our own." The clearest, most ownable line in this field; nobody else claims it as cleanly.</li>
+    <li><strong>Brisbane HQ + genuine Mackay base</strong> — corporate access <em>and</em> coalfields proximity. Only KSG and Cell match the local presence, and neither has Waterline's Brisbane+Mackay+multi-discipline combination.</li>
+    <li><strong>3D scanning &amp; printing</strong> — proven on BHP dragline scale models; only KSG overlaps, and none of the Tier-2/3 specialists offer it as a visible service.</li>
+    <li><strong>24-hour drafting turnaround</strong> — a productised, reliable service with a real Anglo American testimonial. No competitor markets this.</li>
+    <li><strong>Multi-discipline under one roof</strong> — electrical + mechanical + civil/structural; beats single-discipline rivals like Cell and avoids the coordination overhead of using several firms.</li>
+    <li><strong>Senior attention at a fair price</strong> — the entire pitch against Tier 3: no global overhead, no being a small account, faster mobilisation.</li>
+    <li><strong>Blue-chip references</strong> — Stanmore, Anglo American, BHP, Komatsu — credibility on par with the big players.</li>
+  </ul>
+</div>
+
+<h2 class="section">The content / SEO opportunity</h2>
+<p class="lead">Across all 11 competitors, only <strong>SRK, Aurecon, AECOM, Worley and Wave</strong> publish seriously — and they all compete on broad, national/global terms, not the local QLD topics Waterline's buyers actually search. The Tier-1 rivals on Waterline's own turf (KSG, Cell, Orana) have thin or stale content. Combined with the GSC finding that Waterline is 94% branded and ranks page-2 for service terms, this is the clearest opening: <strong>own the local topical hubs nobody contests</strong> — RS23 / Recognised Standard 23, machinery safety (AS 4024), hazardous area audits, and 3D printing for mining. Win the content lane and Waterline can rank for non-branded service terms ahead of the regional rivals, while the giants stay focused on head-terms that don't convert local coalfields buyers.</p>
+
+<footer>
+  <strong>Sources (June 2026):</strong> keysolgroup.com.au · celleng.com.au · oranaeng.com.au · mecmining.com.au · waveinternational.com · palaris.com · enableadvisory.com · srk.com · aurecongroup.com · aecom.com/en-au · worley.com · plus LinkedIn / ZoomInfo / Tracxn / IBISWorld for size, follower and revenue figures (aggregator estimates — verify before customer-facing use). Tier 3 employee counts, revenue and LinkedIn followers are self-reported or third-party estimates and vary by source/date. Battlecard prepared for Waterline Projects. Review quarterly or after major competitor announcements.
+</footer>
+
+</div>
+<script>
+  var tabs=document.querySelectorAll('.tab');
+  var cards=document.querySelectorAll('.card');
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('active')});
+      cards.forEach(function(c){c.classList.remove('show')});
+      t.classList.add('active');
+      document.getElementById(t.dataset.t).classList.add('show');
+    });
+  });
+</script>
+</body>
+</html>
